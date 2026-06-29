@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telejka - Telegram Marketplace</title>
+    <script src="https://web.telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="btn-menu" id="menuBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1 class="app-title">🛍️ Telejka</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn-search" id="searchBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-cart" id="cartBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Page -->
+            <section id="homePage" class="page">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h2>Добро пожаловать в Telejka!</h2>
+                        <p>Маркетплейс прямо в Telegram</p>
+                    </div>
+                </div>
+
+                <div class="categories">
+                    <div class="category-item" data-category="all">
+                        <span class="category-icon">📦</span>
+                        <span>Все</span>
+                    </div>
+                    <div class="category-item" data-category="electronics">
+                        <span class="category-icon">📱</span>
+                        <span>Электроника</span>
+                    </div>
+                    <div class="category-item" data-category="fashion">
+                        <span class="category-icon">👕</span>
+                        <span>Одежда</span>
+                    </div>
+                    <div class="category-item" data-category="books">
+                        <span class="category-icon">📚</span>
+                        <span>Книги</span>
+                    </div>
+                    <div class="category-item" data-category="food">
+                        <span class="category-icon">🍕</span>
+                        <span>Еда</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Популярные товары</div>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Товары загружаются здесь -->
+                </div>
+            </section>
+
+            <!-- Catalog Page -->
+            <section id="catalogPage" class="page" style="display:none;">
+                <div class="filters">
+                    <input type="text" class="search-input" placeholder="Поиск товаров..." id="searchInput">
+                    <div class="filter-row">
+                        <input type="range" min="0" max="100000" class="price-range" id="priceRange">
+                        <span class="price-display">Макс: <span id="priceValue">100000</span> ₽</span>
+                    </div>
+                </div>
+                <div class="products-grid" id="catalogProductsGrid">
+                    <!-- Товары загружаются здесь -->
+                </div>
+            </section>
+
+            <!-- Product Detail Page -->
+            <section id="productPage" class="page" style="display:none;">
+                <div class="product-detail">
+                    <img class="product-image" id="productImage" src="" alt="Product">
+                    <div class="product-info">
+                        <h2 class="product-name" id="productName"></h2>
+                        <div class="product-rating">
+                            <span class="stars" id="productRating">★★★★★</span>
+                            <span class="reviews-count" id="reviewsCount">(0 отзывов)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="price" id="productPrice">0 ₽</span>
+                        </div>
+                        <p class="product-description" id="productDescription"></p>
+                        
+                        <div class="seller-card">
+                            <img class="seller-avatar" id="sellerAvatar" src="" alt="Seller">
+                            <div class="seller-info">
+                                <h4 class="seller-name" id="sellerName"></h4>
+                                <p class="seller-rating" id="sellerRating">★★★★★ (100)</p>
+                            </div>
+                        </div>
+
+                        <div class="quantity-selector">
+                            <button class="qty-btn" id="qtyMinus">−</button>
+                            <input type="number" class="qty-input" id="qtyInput" value="1" min="1">
+                            <button class="qty-btn" id="qtyPlus">+</button>
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="btn-primary btn-add-cart" id="addCartBtn">Добавить в корзину</button>
+                            <button class="btn-secondary" id="chatBtn">Написать продавцу</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cart Page -->
+            <section id="cartPage" class="page" style="display:none;">
+                <div class="cart-container">
+                    <div class="cart-items" id="cartItems">
+                        <!-- Товары в корзине загружаются здесь -->
+                    </div>
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Товаров:</span>
+                            <span id="itemsCount">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Сумма:</span>
+                            <span id="totalSum">0 ₽</span>
+                        </div>
+                        <button class="btn-primary btn-checkout">Оформить заказ</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Page -->
+            <section id="ordersPage" class="page" style="display:none;">
+                <div class="orders-container" id="ordersList">
+                    <!-- Заказы загружаются здесь -->
+                </div>
+            </section>
+
+            <!-- Chat Page -->
+            <section id="chatPage" class="page" style="display:none;">
+                <div class="chats-list" id="chatsList">
+                    <!-- Чаты загружаются здесь -->
+                </div>
+            </section>
+
+            <!-- Chat Detail Page -->
+            <section id="chatDetailPage" class="page" style="display:none;">
+                <div class="chat-header">
+                    <button class="btn-back" id="backFromChat">←</button>
+                    <h3 id="chatTitle"></h3>
+                </div>
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Сообщения загружаются здесь -->
+                </div>
+                <div class="message-input-area">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Сообщение...">
+                    <button class="btn-send" id="sendBtn">📤</button>
+                </div>
+            </section>
+
+            <!-- Profile Page -->
+            <section id="profilePage" class="page" style="display:none;">
+                <div class="profile-header">
+                    <img class="profile-avatar" id="profileAvatar" src="" alt="Profile">
+                    <h2 id="profileName"></h2>
+                    <p id="profileUsername"></p>
+                </div>
+                <div class="profile-menu">
+                    <a href="#" class="menu-item" id="myOrdersLink">📦 Мои заказы</a>
+                    <a href="#" class="menu-item" id="myChatsLink">💬 Мои чаты</a>
+                    <a href="#" class="menu-item" id="myProductsLink">🛍️ Мои товары (для продавцов)</a>
+                    <a href="#" class="menu-item" id="settingsLink">⚙️ Настройки</a>
+                    <a href="#" class="menu-item danger" id="logoutLink">🚪 Выход</a>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Главная</span>
+            </button>
+            <button class="nav-item" data-page="catalog">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span>Каталог</span>
+            </button>
+            <button class="nav-item" data-page="chats">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Чаты</span>
+            </button>
+            <button class="nav-item" data-page="profile">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Профиль</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2>Добро пожаловать в Telejka!</h2>
+            <p>Выберите тип аккаунта:</p>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="buyerBtn">🛍️ Покупатель</button>
+                <button class="btn-primary" id="sellerBtn">🏪 Продавец</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/pages/home.js"></script>
+    <script src="js/pages/catalog.js"></script>
+    <script src="js/pages/product.js"></script>
+    <script src="js/pages/cart.js"></script>
+    <script src="js/pages/orders.js"></script>
+    <script src="js/pages/chat.js"></script>
+    <script src="js/pages/profile.js"></script>
+</body>
+</html>
