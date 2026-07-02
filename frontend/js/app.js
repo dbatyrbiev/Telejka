@@ -1,220 +1,192 @@
-// ========== MAIN APPLICATION ========== 
-const API_URL = 'http://localhost:5000/api';
-let token = localStorage.getItem('token');
-let currentUser = null;
+// ========== MAIN APP ==========
 let currentPage = 'home';
 
-// Initialize Telegram Web App
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
-
-// ========== PAGE NAVIGATION ==========
-function navigateTo(page) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
-    
-    // Show selected page
-    const pageEl = document.getElementById(page + 'Page');
-    if (pageEl) {
-        pageEl.style.display = 'block';
+class AppState {
+    constructor() {
+        this.user = null;
+        this.token = null;
+        this.API_URL = 'https://api.telejka.com';
     }
-    
-    // Update navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.page === page) {
-            item.classList.add('active');
-        }
-    });
-    
-    currentPage = page;
-    
-    // Load page content
-    switch(page) {
-        case 'home':
-            loadHomePage();
-            break;
-        case 'catalog':
-            loadCatalogPage();
-            break;
-        case 'chats':
-            loadChatsPage();
-            break;
-        case 'profile':
-            loadProfilePage();
-            break;
+
+    currentUser() {
+        return this.user;
     }
-}
 
-// ========== EVENT LISTENERS ==========
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        navigateTo(item.dataset.page);
-    });
-});
-
-// Cart button
-document.getElementById('cartBtn').addEventListener('click', () => {
-    navigateTo('cart');
-});
-
-// ========== AUTHENTICATION ==========
-async function checkAuth() {
-    if (!token) {
-        showLoginModal();
-        return false;
+    token() {
+        return this.token;
     }
-    
-    try {
-        const response = await fetch(`${API_URL}/auth/me`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (response.ok) {
-            currentUser = await response.json();
-            return true;
+
+    setToken(token) {
+        this.token = token;
+        if (token) {
+            localStorage.setItem('token', token);
         } else {
             localStorage.removeItem('token');
-            token = null;
-            showLoginModal();
+        }
+    }
+
+    loadToken() {
+        this.token = localStorage.getItem('token');
+        return this.token;
+    }
+
+    async checkAuth() {
+        try {
+            if (!this.token) {
+                this.loadToken();
+            }
+            if (!this.token) {
+                this.navigateTo('login');
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Auth check error:', error);
             return false;
         }
-    } catch (error) {
-        console.error('Auth check failed:', error);
-        showLoginModal();
-        return false;
     }
-}
 
-function showLoginModal() {
-    const modal = document.getElementById('loginModal');
-    modal.classList.add('active');
-    
-    document.getElementById('buyerBtn').addEventListener('click', () => {
-        registerUser('buyer');
-    });
-    
-    document.getElementById('sellerBtn').addEventListener('click', () => {
-        registerUser('seller');
-    });
-}
-
-async function registerUser(userType) {
-    const tgUser = tg.initDataUnsafe?.user;
-    
-    if (!tgUser) {
-        alert('Ошибка: не удалось получить данные пользователя Telegram');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                telegramId: tgUser.id,
-                username: tgUser.username || `user_${tgUser.id}`,
-                firstName: tgUser.first_name,
-                lastName: tgUser.last_name,
-                userType: userType,
-                photoUrl: tgUser.photo_url
-            })
-        });
+    navigateTo(page) {
+        currentPage = page;
         
-        if (response.ok) {
-            const data = await response.json();
-            token = data.token;
-            localStorage.setItem('token', token);
-            currentUser = data.user;
-            
-            document.getElementById('loginModal').classList.remove('active');
-            navigateTo('home');
-        } else {
-            alert('Ошибка регистрации');
+        // Hide all pages
+        document.querySelectorAll('[class*="page"]').forEach(el => {
+            if (el.id && el.id.endsWith('Page')) {
+                el.style.display = 'none';
+            }
+        });
+
+        // Show selected page
+        const pageEl = document.getElementById(`${page}Page`);
+        if (pageEl) {
+            pageEl.style.display = 'block';
         }
-    } catch (error) {
-        console.error('Registration error:', error);
-        alert('Ошибка регистрации');
+
+        // Update nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.page === page) {
+                item.classList.add('active');
+            }
+        });
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+
+        // Load page data
+        this.loadPageData(page);
+    }
+
+    loadPageData(page) {
+        switch(page) {
+            case 'home':
+                if (typeof loadHomePage === 'function') {
+                    loadHomePage();
+                }
+                break;
+            case 'catalog':
+                if (typeof loadCatalogPage === 'function') {
+                    loadCatalogPage();
+                }
+                break;
+            case 'cart':
+                if (typeof loadCartPage === 'function') {
+                    loadCartPage();
+                }
+                break;
+            case 'orders':
+                if (typeof loadOrdersPage === 'function') {
+                    loadOrdersPage();
+                }
+                break;
+            case 'chats':
+                if (typeof loadChatsPage === 'function') {
+                    loadChatsPage();
+                }
+                break;
+            case 'profile':
+                if (typeof loadProfilePage === 'function') {
+                    loadProfilePage();
+                }
+                break;
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    formatPrice(price) {
+        return `${price.toFixed(2)} ₽`;
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+
+        // Minutes ago
+        if (diff < 60000) {
+            return 'только что';
+        }
+
+        // Hours ago
+        if (diff < 3600000) {
+            const hours = Math.floor(diff / 60000);
+            return `${hours}m ago`;
+        }
+
+        // Today
+        if (date.toDateString() === now.toDateString()) {
+            return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Yesterday
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (date.toDateString() === yesterday.toDateString()) {
+            return 'вчера';
+        }
+
+        // This week
+        if (diff < 604800000) {
+            return date.toLocaleDateString('ru-RU', { weekday: 'short' });
+        }
+
+        return date.toLocaleDateString('ru-RU');
     }
 }
 
-// ========== UTILITY FUNCTIONS ==========
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        right: 20px;
-        padding: 12px 16px;
-        background: ${type === 'success' ? '#31a24c' : type === 'error' ? '#ff3b30' : '#0088cc'};
-        color: white;
-        border-radius: 8px;
-        z-index: 2000;
-        animation: slideDown 0.3s ease-out;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
+// Initialize app
+window.app = new AppState();
 
-function formatPrice(price) {
-    return new Intl.NumberFormat('ru-RU', {
-        style: 'currency',
-        currency: 'RUB',
-        minimumFractionDigits: 0
-    }).format(price);
-}
-
-function formatDate(date) {
-    return new Date(date).toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+// Navigation
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        if (page) {
+            window.app.navigateTo(page);
+        }
     });
-}
-
-// ========== INITIALIZE APP ==========
-document.addEventListener('DOMContentLoaded', async () => {
-    const isAuthenticated = await checkAuth();
-    if (isAuthenticated) {
-        navigateTo('home');
-    }
 });
 
-// ========== KEYBOARD ANIMATION ==========
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideDown {
-        from {
-            transform: translateY(-100px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+    window.app.loadToken();
+    
+    if (await window.app.checkAuth()) {
+        window.app.navigateTo('home');
     }
-`;
-document.head.appendChild(style);
-
-// Export functions for other modules
-window.app = {
-    navigateTo,
-    showNotification,
-    formatPrice,
-    formatDate,
-    API_URL,
-    token: () => token,
-    currentUser: () => currentUser
-};
+});
