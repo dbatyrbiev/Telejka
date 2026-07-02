@@ -3,255 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telejka - Telegram Marketplace</title>
-    <script src="https://web.telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <title>Telejka - Telegram Shop</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="header-left">
-                    <button class="btn-menu" id="menuBtn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                    <h1 class="app-title">🛍️ Telejka</h1>
-                </div>
-                <div class="header-right">
-                    <button class="btn-search" id="searchBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                    </button>
-                    <button class="btn-cart" id="cartBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
-                        <span class="cart-badge" id="cartBadge">0</span>
-                    </button>
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page">
+        <div style="padding: var(--spacing-md);">
+            <h1 style="font-size: 24px; margin-bottom: var(--spacing-md);">Добро пожаловать в Telejka</h1>
+            
+            <div style="margin-bottom: var(--spacing-lg);">
+                <h2 style="font-size: 16px; margin-bottom: var(--spacing-sm);">Категории</h2>
+                <div style="display: flex; gap: var(--spacing-sm); overflow-x: auto; padding-bottom: var(--spacing-sm);">
+                    <div class="category-item active" data-category="all" style="padding: 8px 12px; background: var(--tg-primary); color: white; border-radius: var(--radius-md); cursor: pointer; white-space: nowrap;">Все товары</div>
+                    <div class="category-item" data-category="electronics" style="padding: 8px 12px; background: var(--tg-border); border-radius: var(--radius-md); cursor: pointer; white-space: nowrap;">Электроника</div>
+                    <div class="category-item" data-category="books" style="padding: 8px 12px; background: var(--tg-border); border-radius: var(--radius-md); cursor: pointer; white-space: nowrap;">Книги</div>
+                    <div class="category-item" data-category="clothes" style="padding: 8px 12px; background: var(--tg-border); border-radius: var(--radius-md); cursor: pointer; white-space: nowrap;">Одежда</div>
                 </div>
             </div>
-        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Home Page -->
-            <section id="homePage" class="page">
-                <div class="hero">
-                    <div class="hero-content">
-                        <h2>Добро пожаловать в Telejka!</h2>
-                        <p>Маркетплейс прямо в Telegram</p>
-                    </div>
-                </div>
-
-                <div class="categories">
-                    <div class="category-item" data-category="all">
-                        <span class="category-icon">📦</span>
-                        <span>Все</span>
-                    </div>
-                    <div class="category-item" data-category="electronics">
-                        <span class="category-icon">📱</span>
-                        <span>Электроника</span>
-                    </div>
-                    <div class="category-item" data-category="fashion">
-                        <span class="category-icon">👕</span>
-                        <span>Одежда</span>
-                    </div>
-                    <div class="category-item" data-category="books">
-                        <span class="category-icon">📚</span>
-                        <span>Книги</span>
-                    </div>
-                    <div class="category-item" data-category="food">
-                        <span class="category-icon">🍕</span>
-                        <span>Еда</span>
-                    </div>
-                </div>
-
-                <div class="section-title">Популярные товары</div>
-                <div class="products-grid" id="productsGrid">
-                    <!-- Товары загружаются здесь -->
-                </div>
-            </section>
-
-            <!-- Catalog Page -->
-            <section id="catalogPage" class="page" style="display:none;">
-                <div class="filters">
-                    <input type="text" class="search-input" placeholder="Поиск товаров..." id="searchInput">
-                    <div class="filter-row">
-                        <input type="range" min="0" max="100000" class="price-range" id="priceRange">
-                        <span class="price-display">Макс: <span id="priceValue">100000</span> ₽</span>
-                    </div>
-                </div>
-                <div class="products-grid" id="catalogProductsGrid">
-                    <!-- Товары загружаются здесь -->
-                </div>
-            </section>
-
-            <!-- Product Detail Page -->
-            <section id="productPage" class="page" style="display:none;">
-                <div class="product-detail">
-                    <img class="product-image" id="productImage" src="" alt="Product">
-                    <div class="product-info">
-                        <h2 class="product-name" id="productName"></h2>
-                        <div class="product-rating">
-                            <span class="stars" id="productRating">★★★★★</span>
-                            <span class="reviews-count" id="reviewsCount">(0 отзывов)</span>
-                        </div>
-                        <div class="product-price">
-                            <span class="price" id="productPrice">0 ₽</span>
-                        </div>
-                        <p class="product-description" id="productDescription"></p>
-                        
-                        <div class="seller-card">
-                            <img class="seller-avatar" id="sellerAvatar" src="" alt="Seller">
-                            <div class="seller-info">
-                                <h4 class="seller-name" id="sellerName"></h4>
-                                <p class="seller-rating" id="sellerRating">★★★★★ (100)</p>
-                            </div>
-                        </div>
-
-                        <div class="quantity-selector">
-                            <button class="qty-btn" id="qtyMinus">−</button>
-                            <input type="number" class="qty-input" id="qtyInput" value="1" min="1">
-                            <button class="qty-btn" id="qtyPlus">+</button>
-                        </div>
-
-                        <div class="product-actions">
-                            <button class="btn-primary btn-add-cart" id="addCartBtn">Добавить в корзину</button>
-                            <button class="btn-secondary" id="chatBtn">Написать продавцу</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Cart Page -->
-            <section id="cartPage" class="page" style="display:none;">
-                <div class="cart-container">
-                    <div class="cart-items" id="cartItems">
-                        <!-- Товары в корзине загружаются здесь -->
-                    </div>
-                    <div class="cart-summary">
-                        <div class="summary-row">
-                            <span>Товаров:</span>
-                            <span id="itemsCount">0</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Сумма:</span>
-                            <span id="totalSum">0 ₽</span>
-                        </div>
-                        <button class="btn-primary btn-checkout">Оформить заказ</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Orders Page -->
-            <section id="ordersPage" class="page" style="display:none;">
-                <div class="orders-container" id="ordersList">
-                    <!-- Заказы загружаются здесь -->
-                </div>
-            </section>
-
-            <!-- Chat Page -->
-            <section id="chatPage" class="page" style="display:none;">
-                <div class="chats-list" id="chatsList">
-                    <!-- Чаты загружаются здесь -->
-                </div>
-            </section>
-
-            <!-- Chat Detail Page -->
-            <section id="chatDetailPage" class="page" style="display:none;">
-                <div class="chat-header">
-                    <button class="btn-back" id="backFromChat">←</button>
-                    <h3 id="chatTitle"></h3>
-                </div>
-                <div class="messages-container" id="messagesContainer">
-                    <!-- Сообщения загружаются здесь -->
-                </div>
-                <div class="message-input-area">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Сообщение...">
-                    <button class="btn-send" id="sendBtn">📤</button>
-                </div>
-            </section>
-
-            <!-- Profile Page -->
-            <section id="profilePage" class="page" style="display:none;">
-                <div class="profile-header">
-                    <img class="profile-avatar" id="profileAvatar" src="" alt="Profile">
-                    <h2 id="profileName"></h2>
-                    <p id="profileUsername"></p>
-                </div>
-                <div class="profile-menu">
-                    <a href="#" class="menu-item" id="myOrdersLink">📦 Мои заказы</a>
-                    <a href="#" class="menu-item" id="myChatsLink">💬 Мои чаты</a>
-                    <a href="#" class="menu-item" id="myProductsLink">🛍️ Мои товары (для продавцов)</a>
-                    <a href="#" class="menu-item" id="settingsLink">⚙️ Настройки</a>
-                    <a href="#" class="menu-item danger" id="logoutLink">🚪 Выход</a>
-                </div>
-            </section>
-        </main>
-
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-page="home">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span>Главная</span>
-            </button>
-            <button class="nav-item" data-page="catalog">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-                <span>Каталог</span>
-            </button>
-            <button class="nav-item" data-page="chats">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>Чаты</span>
-            </button>
-            <button class="nav-item" data-page="profile">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Профиль</span>
-            </button>
-        </nav>
+            <div id="productsGrid"></div>
+        </div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2>Добро пожаловать в Telejka!</h2>
-            <p>Выберите тип аккаунта:</p>
-            <div class="modal-buttons">
-                <button class="btn-primary" id="buyerBtn">🛍️ Покупатель</button>
-                <button class="btn-primary" id="sellerBtn">🏪 Продавец</button>
+    <!-- PRODUCT PAGE -->
+    <div id="productPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <img id="productImage" src="" alt="" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: var(--spacing-md);">
+            
+            <h1 id="productName" style="font-size: 20px; margin-bottom: var(--spacing-sm);"></h1>
+            <div id="productPrice" style="font-size: 24px; color: var(--tg-primary); font-weight: bold; margin-bottom: var(--spacing-md);"></div>
+            
+            <div style="background: var(--tg-border); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-md);">
+                <h3 style="font-size: 14px; margin-bottom: var(--spacing-sm);">О продавце</h3>
+                <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+                    <img id="sellerAvatar" src="" alt="" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <div id="sellerName" style="font-weight: bold; font-size: 14px;"></div>
+                        <div id="sellerRating" style="font-size: 12px; color: var(--tg-warning);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: var(--tg-border); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-md);">
+                <h3 style="font-size: 14px; margin-bottom: var(--spacing-sm);">Описание</h3>
+                <p id="productDescription" style="font-size: 14px; line-height: 1.6; color: var(--tg-text-secondary);"></p>
+            </div>
+
+            <div style="display: flex; gap: var(--spacing-sm); align-items: center; margin-bottom: var(--spacing-md);">
+                <span style="font-size: 14px;">Количество:</span>
+                <button id="qtyMinus" style="width: 32px; height: 32px; border: 1px solid var(--tg-border); border-radius: var(--radius-sm); cursor: pointer;">−</button>
+                <input id="qtyInput" type="number" value="1" min="1" style="width: 50px; text-align: center; border: 1px solid var(--tg-border); border-radius: var(--radius-sm); margin: 0;">
+                <button id="qtyPlus" style="width: 32px; height: 32px; border: 1px solid var(--tg-border); border-radius: var(--radius-sm); cursor: pointer;">+</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+                <button id="chatBtn" class="btn-secondary" style="width: 100%;">💬 Чат</button>
+                <button id="addCartBtn" class="btn-primary" style="width: 100%;">🛒 В корзину</button>
+            </div>
+
+            <div style="margin-top: var(--spacing-md);">
+                <h3 style="font-size: 14px; margin-bottom: var(--spacing-sm);">Отзывы <span id="reviewsCount"></span></h3>
+                <div style="text-align: center; padding: var(--spacing-lg); color: var(--tg-text-secondary);">Отзывы загружаются...</div>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <!-- CATALOG PAGE -->
+    <div id="catalogPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <h1 style="font-size: 24px; margin-bottom: var(--spacing-md);">Каталог</h1>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                <input id="searchInput" type="text" placeholder="Поиск товаров..." style="grid-column: 1/-1;">
+                <select id="sortSelect" style="margin-bottom: 0;">
+                    <option value="">Сортировка</option>
+                    <option value="price-asc">Цена: от низкой к высокой</option>
+                    <option value="price-desc">Цена: от высокой к низкой</option>
+                    <option value="name-asc">Название: А-Я</option>
+                    <option value="name-desc">Название: Я-А</option>
+                </select>
+            </div>
+
+            <div id="catalogGrid"></div>
+        </div>
+    </div>
+
+    <!-- CART PAGE -->
+    <div id="cartPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <h1 style="font-size: 24px; margin-bottom: var(--spacing-md);">Корзина</h1>
+            
+            <div id="cartItems"></div>
+
+            <div id="cartSummary" style="background: var(--tg-border); padding: var(--spacing-md); border-radius: var(--radius-md); margin-top: var(--spacing-md); display: none;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm);">
+                    <span>Подитог:</span>
+                    <span id="subtotal">0 ₽</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm);">
+                    <span>Доставка:</span>
+                    <span id="shipping">0 ₽</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-md); border-bottom: 1px solid var(--tg-border); padding-bottom: var(--spacing-sm);">
+                    <span>Налог:</span>
+                    <span id="tax">0 ₽</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: var(--spacing-md);">
+                    <span>Итого:</span>
+                    <span id="total">0 ₽</span>
+                </div>
+                <button id="checkoutBtn" class="btn-primary" style="width: 100%;">Оформить заказ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div id="ordersPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <h1 style="font-size: 24px; margin-bottom: var(--spacing-md);">Мои заказы</h1>
+            <div id="ordersList"></div>
+        </div>
+    </div>
+
+    <!-- CHATS PAGE -->
+    <div id="chatsPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <h1 style="font-size: 24px; margin-bottom: var(--spacing-md);">Сообщения</h1>
+            <div id="chatsList"></div>
+        </div>
+    </div>
+
+    <!-- CHAT DETAIL PAGE -->
+    <div id="chatDetailPage" class="page" style="display: none;">
+        <div style="display: flex; flex-direction: column; height: 100vh;">
+            <button onclick="window.app.navigateTo('chats')" style="padding: var(--spacing-sm); background: var(--tg-border); border: none; cursor: pointer; font-weight: bold;">← Назад</button>
+            <div id="chatMessages" style="flex: 1; overflow-y: auto;"></div>
+            <div style="padding: var(--spacing-sm); border-top: 1px solid var(--tg-border); display: flex; gap: var(--spacing-sm);">
+                <input id="messageInput" type="text" placeholder="Введите сообщение..." style="margin-bottom: 0;">
+                <button id="sendBtn" class="btn-primary" style="width: 60px; white-space: nowrap;">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+                <img id="profileAvatar" src="" alt="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: var(--spacing-md);">
+                <h1 id="profileName" style="font-size: 24px; margin-bottom: var(--spacing-xs);"></h1>
+                <p id="profileUsername" style="color: var(--tg-text-secondary); margin-bottom: var(--spacing-sm);"></p>
+                <p id="profileType" style="font-weight: bold; color: var(--tg-primary);"></p>
+            </div>
+
+            <div id="sellerStatsDiv" style="background: var(--tg-border); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-md); display: none;">
+                <h3 style="margin-bottom: var(--spacing-sm);">Статистика продавца</h3>
+                <div style="display: flex; justify-content: space-around;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: var(--tg-primary);"><span id="totalSales">0</span></div>
+                        <div style="font-size: 12px; color: var(--tg-text-secondary);">Продаж</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div id="sellerRating" style="font-size: 14px; color: var(--tg-warning);"></div>
+                        <div style="font-size: 12px; color: var(--tg-text-secondary);">Рейтинг</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+                <button id="editProfileBtn" class="btn-primary">Редактировать</button>
+                <button id="settingsBtn" class="btn-secondary">Настройки</button>
+            </div>
+            <button id="logoutBtn" class="btn-secondary" style="width: 100%; margin-top: var(--spacing-sm);">Выход</button>
+        </div>
+    </div>
+
+    <!-- SELLER PAGE -->
+    <div id="sellerPage" class="page" style="display: none;">
+        <div style="padding: var(--spacing-md);">
+            <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+                <img id="sellerPageAvatar" src="" alt="" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: var(--spacing-sm);">
+                <h1 id="sellerPageName" style="font-size: 24px; margin-bottom: var(--spacing-xs);"></h1>
+                <p id="sellerPageUsername" style="color: var(--tg-text-secondary);"></p>
+                <div id="sellerPageRating" style="color: var(--tg-warning); margin-bottom: var(--spacing-sm);"></div>
+                <p id="sellerPageSales" style="font-size: 14px; color: var(--tg-text-secondary);"></p>
+            </div>
+
+            <p id="sellerPageDescription" style="background: var(--tg-border); padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-md); font-size: 14px;"></p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                <button id="followBtn" class="btn-primary">Подписаться</button>
+                <button id="chatSellerBtn" class="btn-secondary">Написать</button>
+            </div>
+
+            <select id="sellerSortSelect" style="margin-bottom: var(--spacing-md);">
+                <option value="">Сортировка товаров</option>
+                <option value="price-asc">Цена: от низкой к высокой</option>
+                <option value="price-desc">Цена: от высокой к низкой</option>
+                <option value="newest">Новые товары</option>
+            </select>
+
+            <div id="sellerProducts"></div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="successModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: var(--tg-success); margin-bottom: var(--spacing-md);">✓ Заказ оформлен!</h2>
+            <p style="margin-bottom: var(--spacing-sm);">Номер заказа:</p>
+            <div id="orderNumber" style="font-size: 24px; font-weight: bold; color: var(--tg-primary); margin-bottom: var(--spacing-md);"></div>
+            <p style="color: var(--tg-text-secondary);">Спасибо за заказ! Вы будете перенаправлены...</p>
+        </div>
+    </div>
+
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: var(--spacing-md);">Редактировать профиль</h2>
+            <input id="editUsername" type="text" placeholder="Имя пользователя">
+            <input id="editFirstName" type="text" placeholder="Имя">
+            <input id="editLastName" type="text" placeholder="Фамилия">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+                <button id="saveProfileBtn" class="btn-primary">Сохранить</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: var(--spacing-md);">Настройки</h2>
+            <div style="margin-bottom: var(--spacing-md);">
+                <label style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <input type="checkbox" checked>
+                    <span>Уведомления о заказах</span>
+                </label>
+            </div>
+            <div style="margin-bottom: var(--spacing-md);">
+                <label style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <input type="checkbox" checked>
+                    <span>Уведомления о сообщениях</span>
+                </label>
+            </div>
+            <button class="btn-secondary modal-close" style="width: 100%;">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav style="position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--tg-border); display: flex; justify-content: space-around; padding: var(--spacing-sm) 0;">
+        <div class="nav-item active" data-page="home" style="flex: 1; text-align: center; padding: var(--spacing-sm); cursor: pointer; border-top: 3px solid transparent;">🏠 Главная</div>
+        <div class="nav-item" data-page="catalog" style="flex: 1; text-align: center; padding: var(--spacing-sm); cursor: pointer; border-top: 3px solid transparent;">🔍 Каталог</div>
+        <div class="nav-item" data-page="cart" style="flex: 1; text-align: center; padding: var(--spacing-sm); cursor: pointer; border-top: 3px solid transparent;">🛒 Корзина <span id="cartBadge" style="display: none; background: var(--tg-danger); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; position: absolute; top: -5px; right: -5px;"></span></div>
+        <div class="nav-item" data-page="chats" style="flex: 1; text-align: center; padding: var(--spacing-sm); cursor: pointer; border-top: 3px solid transparent;">💬 Чаты</div>
+        <div class="nav-item" data-page="profile" style="flex: 1; text-align: center; padding: var(--spacing-sm); cursor: pointer; border-top: 3px solid transparent;">👤 Профиль</div>
+    </nav>
+
+    <div style="height: 80px;"></div>
+
+    <!-- SCRIPTS -->
     <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/pages/home.js"></script>
-    <script src="js/pages/catalog.js"></script>
     <script src="js/pages/product.js"></script>
+    <script src="js/pages/catalog.js"></script>
     <script src="js/pages/cart.js"></script>
     <script src="js/pages/orders.js"></script>
-    <script src="js/pages/chat.js"></script>
+    <script src="js/pages/chats.js"></script>
     <script src="js/pages/profile.js"></script>
+    <script src="js/pages/seller.js"></script>
 </body>
 </html>

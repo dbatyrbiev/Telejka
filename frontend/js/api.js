@@ -1,183 +1,167 @@
-// ========== API MODULE ==========
-class API {
-    constructor(baseURL, tokenGetter) {
-        this.baseURL = baseURL;
-        this.tokenGetter = tokenGetter;
+// ========== API CLIENT ==========
+class APIClient {
+    constructor(baseURL) {
+        this.baseURL = baseURL || 'https://api.telejka.com';
     }
 
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
         const headers = {
             'Content-Type': 'application/json',
-            ...options.headers
+            ...options.headers,
         };
 
-        const token = this.tokenGetter();
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+        if (window.app && window.app.token) {
+            headers['Authorization'] = `Bearer ${window.app.token}`;
         }
 
         try {
             const response = await fetch(url, {
                 ...options,
-                headers
+                headers,
             });
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    localStorage.removeItem('token');
-                    window.location.reload();
+                    window.app.setToken(null);
+                    window.app.navigateTo('login');
                 }
-                const error = await response.json();
-                throw new Error(error.error || 'API Error');
+                throw new Error(`API error: ${response.status}`);
             }
 
-            if (response.status === 204) return null;
             return await response.json();
         } catch (error) {
-            console.error('API Error:', error);
+            console.error('API request error:', error);
             throw error;
         }
     }
 
-    // Products
-    getProducts(page = 1, limit = 20, filters = {}) {
-        const params = new URLSearchParams({
-            page,
-            limit,
-            ...filters
+    // Auth
+    async login(phone, password) {
+        const data = await this.request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ phone, password }),
         });
-        return this.request(`/products?${params}`);
+        if (data.token) {
+            window.app.setToken(data.token);
+            window.app.user = data.user;
+        }
+        return data;
     }
 
-    getProduct(id) {
+    async register(userData) {
+        const data = await this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify(userData),
+        });
+        if (data.token) {
+            window.app.setToken(data.token);
+            window.app.user = data.user;
+        }
+        return data;
+    }
+
+    async getCurrentUser() {
+        const data = await this.request('/users/me');
+        window.app.user = data;
+        return data;
+    }
+
+    // Products
+    async getProducts(page = 1, limit = 20, filters = {}) {
+        let query = `?page=${page}&limit=${limit}`;
+        if (filters.category) query += `&category=${filters.category}`;
+        if (filters.search) query += `&search=${filters.search}`;
+        return this.request(`/products${query}`);
+    }
+
+    async getProduct(id) {
         return this.request(`/products/${id}`);
     }
 
-    createProduct(data) {
-        return this.request('/products', {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    }
-
-    updateProduct(id, data) {
-        return this.request(`/products/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(data)
-        });
-    }
-
-    deleteProduct(id) {
-        return this.request(`/products/${id}`, {
-            method: 'DELETE'
-        });
-    }
-
     // Cart
-    getCart() {
+    async getCart() {
         return this.request('/cart');
     }
 
-    addToCart(productId, quantity = 1) {
-        return this.request('/cart/add', {
+    async addToCart(productId, quantity) {
+        return this.request('/cart/items', {
             method: 'POST',
-            body: JSON.stringify({ productId, quantity })
+            body: JSON.stringify({ productId, quantity }),
         });
     }
 
-    updateCartItem(cartItemId, quantity) {
-        return this.request(`/cart/${cartItemId}`, {
+    async updateCartItem(cartItemId, quantity) {
+        return this.request(`/cart/items/${cartItemId}`, {
             method: 'PUT',
-            body: JSON.stringify({ quantity })
+            body: JSON.stringify({ quantity }),
         });
     }
 
-    removeFromCart(cartItemId) {
-        return this.request(`/cart/${cartItemId}`, {
-            method: 'DELETE'
+    async removeFromCart(cartItemId) {
+        return this.request(`/cart/items/${cartItemId}`, {
+            method: 'DELETE',
         });
     }
 
-    clearCart() {
+    async clearCart() {
         return this.request('/cart', {
-            method: 'DELETE'
+            method: 'DELETE',
         });
     }
 
     // Orders
-    getOrders() {
+    async createOrder(orderData) {
+        return this.request('/orders', {
+            method: 'POST',
+            body: JSON.stringify(orderData),
+        });
+    }
+
+    async getOrders() {
         return this.request('/orders');
     }
 
-    getOrder(id) {
+    async getOrder(id) {
         return this.request(`/orders/${id}`);
     }
 
-    createOrder(data) {
-        return this.request('/orders', {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    }
-
-    updateOrder(id, data) {
-        return this.request(`/orders/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(data)
-        });
-    }
-
-    // Chat
-    getChats() {
-        return this.request('/chat');
-    }
-
-    getChatMessages(chatId) {
-        return this.request(`/chat/${chatId}`);
-    }
-
-    sendMessage(chatId, message) {
-        return this.request(`/chat/${chatId}/message`, {
-            method: 'POST',
-            body: JSON.stringify({ message })
-        });
-    }
-
-    createOrGetChat(otherUserId) {
-        return this.request('/chat/or-create', {
-            method: 'POST',
-            body: JSON.stringify({ otherUserId })
-        });
-    }
-
-    // Reviews
-    getReviews(productId) {
-        return this.request(`/reviews?productId=${productId}`);
-    }
-
-    createReview(data) {
-        return this.request('/reviews', {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    }
-
     // Sellers
-    getSeller(id) {
+    async getSeller(id) {
         return this.request(`/sellers/${id}`);
     }
 
-    getSellerProducts(id) {
-        return this.request(`/sellers/${id}/products`);
+    async getSellerProducts(sellerId) {
+        return this.request(`/sellers/${sellerId}/products`);
     }
 
-    getSellerRating(id) {
-        return this.request(`/sellers/${id}/rating`);
+    async getSellerRating(sellerId) {
+        return this.request(`/sellers/${sellerId}/rating`);
+    }
+
+    // Chats
+    async getChats() {
+        return this.request('/chats');
+    }
+
+    async getChatMessages(chatId) {
+        return this.request(`/chats/${chatId}/messages`);
+    }
+
+    async sendMessage(chatId, message) {
+        return this.request(`/chats/${chatId}/messages`, {
+            method: 'POST',
+            body: JSON.stringify({ message }),
+        });
+    }
+
+    async createOrGetChat(userId) {
+        return this.request('/chats', {
+            method: 'POST',
+            body: JSON.stringify({ userId }),
+        });
     }
 }
 
-// Initialize API
-const api = new API(window.app.API_URL, () => window.app.token());
-
-window.api = api;
+// Initialize API client
+const api = new APIClient();
