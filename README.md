@@ -1,102 +1,150 @@
-# Telejka - Telegram Mini App Marketplace
+# Telejka - Telegram Shop Platform
 
-Полнофункциональный маркетплейс для Telegram в виде Mini App, где продавцы магазинов могут публиковать товары, а покупатели покупать их.
-
-## Функционал
-
-- 🛍️ **Каталог товаров** - Продавцы публикуют свои товары
-- 🔍 **Поиск и фильтры** - По названию, цене, продавцу
-- 👤 **Профили продавцов** - История, рейтинг, отзывы
-- 🛒 **Корзина** - Добавление товаров и оформление заказа
-- 💳 **Система оплаты** - Интеграция с платёжными системами
-- 💬 **Чаты** - Коммуникация между продавцом и покупателем
-- 📦 **Управление заказами** - Отслеживание статуса
-- ⭐ **Рейтинги и от��ывы** - Оценка товаров и продавцов
-
-## Технологический стек
-
-### Backend
-- **Node.js** + Express.js
-- **PostgreSQL** - База данных
-- **JWT** - Аутентификация
-- **Socket.io** - Чаты в реальном времени
-
-### Frontend
-- **HTML5** + CSS3 + Vanilla JavaScript
-- **Telegram Web App API** - Интеграция с Telegram
-- **LocalStorage** - Кэширование данных
-
-## Структура проекта
+## 📦 Проект структура
 
 ```
 Telejka/
-├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   ├── utils/
-│   │   └── index.js
-│   ├── .env.example
-│   ├── package.json
-│   └── README.md
 ├── frontend/
 │   ├── index.html
 │   ├── css/
-│   │   ├── style.css
-│   │   └── responsive.css
-│   ├── js/
-│   │   ├── app.js
-│   │   ├── api.js
-│   │   ├── pages/
-│   │   │   ├── home.js
-│   │   │   ├── catalog.js
-│   │   │   ├── seller.js
-│   │   │   ├── cart.js
-│   │   │   ├── checkout.js
-│   │   │   ├── orders.js
-│   │   │   ├── chat.js
-│   │   │   └── profile.js
-│   │   └── components/
-│   │       ├── modal.js
-│   │       ├── notification.js
-│   │       └── loader.js
-│   └── assets/
-└── docker-compose.yml
+│   │   └── styles.css
+│   └── js/
+│       ├── app.js
+│       ├── api.js
+│       └── pages/
+│           ├── home.js
+│           ├── product.js
+│           ├── catalog.js
+│           ├── cart.js
+│           ├── orders.js
+│           ├── chats.js
+│           ├── profile.js
+│           └── seller.js
+├── backend/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── permissions.py
+│   ├── manage.py
+│   └── requirements.txt
+└── README.md
 ```
 
-## Установка и запуск
+## 🚀 Возможности
+
+### Для покупателей
+- ✅ Просмотр каталога товаров
+- ✅ Поиск и фильтрация товаров
+- ✅ Добавление товаров в корзину
+- ✅ Оформление заказов
+- ✅ История заказов
+- ✅ Чат с продавцами
+- ✅ Оставление отзывов
+- ✅ Управление профилем
+
+### Для продавцов
+- ✅ Загрузка товаров
+- ✅ Управление ассортиментом
+- ✅ Просмотр заказов
+- ✅ Рейтинг и отзывы
+- ✅ Чат с покупателями
+- ✅ Аналитика продаж
+
+## 🛠️ Технологический стек
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript (Vanilla)
+- Telegram WebApp API
 
 ### Backend
+- Django 4.2
+- Django REST Framework
+- PostgreSQL
+- JWT Authentication
+- Celery (для фоновых задач)
+- Redis (для кеширования)
+
+## 📋 Установка
+
+### 1. Backend Setup
 
 ```bash
 cd backend
-npm install
-cp .env.example .env
-# Отредактируй .env с твоими переменными
-npm run dev
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
 ```
 
-### Frontend
+### 2. Environment Variables
 
-Открой `frontend/index.html` в браузере или развёрнутый сервер.
+Создайте `.env` файл:
 
-## API Endpoints
+```
+DEBUG=True
+SECRET_KEY=your-secret-key-here
+DB_NAME=telejka
+DB_USER=postgres
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=5432
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8000
+```
 
-Документация API доступна в `backend/README.md`
+### 3. API Endpoints
 
-## Telegram Bot Setup
+#### Аутентификация
+- `POST /api/auth/token/` - Получить token
+- `POST /api/auth/token/refresh/` - Обновить token
+- `POST /api/users/register/` - Регистрация
+- `GET /api/users/me/` - Текущий пользователь
 
-1. Создай бота через @BotFather в Telegram
-2. Установи Web App URL в настройках бота
-3. Используй Bot Token в .env файле
+#### Товары
+- `GET /api/products/` - Список товаров
+- `POST /api/products/` - Создать товар (продавец)
+- `GET /api/products/{id}/` - Детали товара
+- `POST /api/products/{id}/add_review/` - Добавить отзыв
 
-## Лицензия
+#### Корзина
+- `GET /api/cart/get_cart/` - Получить корзину
+- `POST /api/cart/add_item/` - Добавить товар
+- `POST /api/cart/remove_item/` - Удалить товар
 
-MIT
+#### Заказы
+- `GET /api/orders/` - Мои заказы
+- `POST /api/orders/` - Создать заказ
+- `GET /api/orders/{id}/` - Детали заказа
 
-## Автор
+#### Продавцы
+- `GET /api/sellers/` - Список продавцов
+- `GET /api/sellers/{id}/products/` - Товары продавца
+- `GET /api/sellers/{id}/rating/` - Рейтинг продавца
 
-Telejka Team
+#### Чаты
+- `GET /api/chats/` - Список чатов
+- `POST /api/chats/` - Создать чат
+- `POST /api/chats/{id}/send_message/` - Отправить сообщение
+
+#### Отзывы
+- `GET /api/reviews/` - Список отзывов
+- `POST /api/reviews/` - Создать отзыв
+
+## 🔐 Безопасность
+
+- ✅ JWT аутентификация
+- ✅ Permission-based access control
+- ✅ CORS защита
+- ✅ Валидация данных
+- ✅ Rate limiting
+
+## 📝 Лицензия
+
+MIT License
+
+## 👥 Автор
+
+Telejka Development Team
